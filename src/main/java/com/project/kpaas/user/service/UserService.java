@@ -7,7 +7,7 @@ import com.project.kpaas.user.dto.LoginRequestDto;
 import com.project.kpaas.user.dto.SignupRequestDto;
 import com.project.kpaas.user.repository.UserRepository;
 import com.project.kpaas.user.entity.User;
-import com.project.kpaas.user.entity.UserRoleEnum;
+import com.project.kpaas.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpHeaders;
@@ -43,13 +43,13 @@ public class UserService {
             throw new CustomException(DUPLICATE_USER);
         }
 
-        UserRoleEnum role = UserRoleEnum.USER;
+        UserRole role = UserRole.USER;
 
         if (signupRequestDto.isAdmin()) {
             if (!signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
                 throw new CustomException(INVALID_ADMIN_TOKEN);
             }
-            role = UserRoleEnum.ADMIN;
+            role = UserRole.ADMIN;
         }
 
         User user = User.of(username, email, password, role);

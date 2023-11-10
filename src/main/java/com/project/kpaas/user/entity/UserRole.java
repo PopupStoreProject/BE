@@ -1,12 +1,12 @@
 package com.project.kpaas.user.entity;
 
-public enum UserRoleEnum {
+public enum UserRole {
     USER(Authority.USER),
     ADMIN(Authority.ADMIN);
 
     private final String authority;
 
-    UserRoleEnum(String authority) {
+    UserRole(String authority) {
         this.authority = authority;
     }
 

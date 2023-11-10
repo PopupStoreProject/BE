@@ -1,6 +1,6 @@
 package com.project.kpaas.global.util;
 
-import com.project.kpaas.user.entity.UserRoleEnum;
+import com.project.kpaas.user.entity.UserRole;
 import com.project.kpaas.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -49,7 +49,7 @@ public class JwtUtil {
         return null;
     }
 
-    public String createToken(String username, UserRoleEnum role) {
+    public String createToken(String username, UserRole role) {
         Date date = new Date();
 
         return BEARER_PREFIX +

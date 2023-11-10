@@ -1,6 +1,5 @@
 package com.project.kpaas.user.entity;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,17 +26,17 @@ public class User {
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private UserRoleEnum role;
+    private UserRole role;
 
     @Builder
-    private User(String username, String email, String password, UserRoleEnum role) {
+    private User(String username, String email, String password, UserRole role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public static User of(String username, String email, String password, UserRoleEnum role) {
+    public static User of(String username, String email, String password, UserRole role) {
         return User.builder()
                 .username(username)
                 .email(email)
