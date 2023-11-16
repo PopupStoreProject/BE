@@ -30,9 +30,9 @@ public class PopupService {
     @Transactional
     public ResponseEntity<MessageResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
 
-//        if (userDetails.getUser().getRole() == UserRole.USER) {
-//            throw new CustomException(ErrorCode.AUTHORIZATION);
-//        }
+        if (userDetails.getUser().getRole() == UserRole.USER) {
+            throw new CustomException(ErrorCode.AUTHORIZATION);
+        }
 
         PopupStore newPopupStore = PopupStore.from(popupRequestDto, userDetails.getUser());
 

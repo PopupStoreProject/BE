@@ -35,13 +35,13 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return this.username;
+    public String getPassword() {
+        return null;
     }
 
     @Override
-    public String getPassword() {
-        return null;
+    public String getUsername() {
+        return this.username;
     }
 
     @Override
