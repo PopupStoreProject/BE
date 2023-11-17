@@ -1,6 +1,6 @@
 package com.project.kpaas.user.service;
 
-import com.project.kpaas.global.dto.MessageResponseDto;
+import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.util.JwtUtil;
 import com.project.kpaas.user.dto.LoginRequestDto;
@@ -32,7 +32,7 @@ public class UserService {
     private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
 
-    public ResponseEntity<MessageResponseDto> signup(SignupRequestDto signupRequestDto) {
+    public ResponseEntity<SuccessResponseDto> signup(SignupRequestDto signupRequestDto) {
 
         String username = signupRequestDto.getUsername();
         String email = signupRequestDto.getEmail();
@@ -55,11 +55,11 @@ public class UserService {
         User user = User.of(username, email, password, role);
         userRepository.save(user);
         return ResponseEntity.ok()
-                .body(MessageResponseDto.of("회원가입 완료", HttpStatus.OK));
+                .body(SuccessResponseDto.of("회원가입 완료", HttpStatus.OK));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponseDto> login(LoginRequestDto loginRequestDto) {
+    public ResponseEntity<SuccessResponseDto> login(LoginRequestDto loginRequestDto) {
 
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
@@ -78,7 +78,7 @@ public class UserService {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(MessageResponseDto.of("로그인 성공", HttpStatus.OK));
+                .body(SuccessResponseDto.of("로그인 성공", HttpStatus.OK));
     }
 
 }

@@ -5,19 +5,19 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class MessageResponseDto {
+public class SuccessResponseDto {
 
     private String msg;
     private int statusCode;
 
     @Builder
-    private MessageResponseDto(String msg, int statusCode) {
+    private SuccessResponseDto(String msg, int statusCode) {
         this.msg = msg;
         this.statusCode = statusCode;
     }
 
-    public static MessageResponseDto of(String msg, HttpStatus status) {
-        return MessageResponseDto.builder()
+    public static SuccessResponseDto of(String msg, HttpStatus status) {
+        return SuccessResponseDto.builder()
                 .msg(msg)
                 .statusCode(status.value())
                 .build();
