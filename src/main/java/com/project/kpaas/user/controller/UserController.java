@@ -1,7 +1,7 @@
 package com.project.kpaas.user.controller;
 
 import com.project.kpaas.user.dto.LoginRequestDto;
-import com.project.kpaas.global.dto.MessageResponseDto;
+import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.user.dto.SignupRequestDto;
 import com.project.kpaas.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<MessageResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<SuccessResponseDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         return userService.login(loginRequestDto);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MessageResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<SuccessResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         return userService.signup(signupRequestDto);
     }
 
