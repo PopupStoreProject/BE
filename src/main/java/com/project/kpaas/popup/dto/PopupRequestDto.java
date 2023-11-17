@@ -11,4 +11,5 @@ public class PopupRequestDto {
     private String startDate;
     private String endDate;
     private String gps;
+    private String regionName;
 }
