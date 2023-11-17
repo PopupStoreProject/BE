@@ -15,15 +15,19 @@ public class PopupResponseDto {
     private String startDate;
     private String endDate;
     private String gps;
+    private String imageUrl;
+    private String homepageUrl;
 
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String startDate, String endDate, String gps) {
+    private PopupResponseDto(Long id, String popupName, String content, String startDate, String endDate, String gps, String imageUrl, String homepageUrl) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
         this.startDate = startDate;
         this.endDate = endDate;
         this.gps = gps;
+        this.imageUrl = imageUrl;
+        this.homepageUrl = homepageUrl;
     }
 
     public static PopupResponseDto of(PopupStore popupStore) {
@@ -34,6 +38,8 @@ public class PopupResponseDto {
                 .startDate(popupStore.getStartDate())
                 .endDate(popupStore.getEndDate())
                 .gps(popupStore.getGps())
+                .imageUrl(popupStore.getImageUrl())
+                .homepageUrl(popupStore.getHomepageUrl())
                 .build();
     }
 }

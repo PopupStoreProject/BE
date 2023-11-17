@@ -12,4 +12,6 @@ public class PopupRequestDto {
     private String endDate;
     private String gps;
     private String regionName;
+    private String imageUrl;
+    private String homepageUrl;
 }
