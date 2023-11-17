@@ -35,20 +35,27 @@ public class PopupStore {
     @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
+
+
     @Builder
-    private PopupStore(PopupRequestDto popupRequestDto, User user) {
+    private PopupStore(PopupRequestDto popupRequestDto, User user, Region region) {
         this.popupName = popupRequestDto.getPopupName();
         this.content = popupRequestDto.getContent();
         this.startDate = popupRequestDto.getStartDate();
         this.endDate = popupRequestDto.getEndDate();
         this.gps = popupRequestDto.getGps();
         this.user = user;
+        this.region = region;
     }
 
-    public static PopupStore from(PopupRequestDto popupRequestDto, User user) {
+    public static PopupStore of(PopupRequestDto popupRequestDto, User user, Region region) {
         return PopupStore.builder()
                 .popupRequestDto(popupRequestDto)
                 .user(user)
+                .region(region)
                 .build();
     }
 }
