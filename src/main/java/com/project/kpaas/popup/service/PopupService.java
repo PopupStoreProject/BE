@@ -1,5 +1,8 @@
 package com.project.kpaas.popup.service;
 
+import com.project.kpaas.classification.entity.Category;
+import com.project.kpaas.classification.repository.CategoryRepository;
+import com.project.kpaas.classification.service.CategoryService;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,8 @@ public class PopupService {
 
     private final PopupRepository popupRepository;
     private final RegionRepository regionRepository;
+    private final CategoryRepository categoryRepository;
+
 
     @Transactional
     public ResponseEntity<MessageResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
@@ -42,7 +48,7 @@ public class PopupService {
 
         PopupStore newPopupStore = PopupStore.of(popupRequestDto, userDetails.getUser(), region);
         popupRepository.save(newPopupStore);
-        return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "게시글 등록 완료", newPopupStore.getId()));
+        return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
     @Transactional
