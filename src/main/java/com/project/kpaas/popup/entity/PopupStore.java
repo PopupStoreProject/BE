@@ -1,5 +1,6 @@
 package com.project.kpaas.popup.entity;
 
+import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,9 @@ public class PopupStore {
     private String endDate;
 
     @Column(nullable = false)
+    private String openingHours;
+
+    @Column(nullable = false)
     private String gps;
 
     @Column(nullable = false)
@@ -45,13 +49,19 @@ public class PopupStore {
     @JoinColumn(name = "region_id")
     private Region region;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 
     @Builder
-    private PopupStore(PopupRequestDto popupRequestDto, User user, Region region) {
+    private PopupStore(PopupRequestDto popupRequestDto, Category category, User user, Region region) {
         this.popupName = popupRequestDto.getPopupName();
         this.content = popupRequestDto.getContent();
+        this.category = category;
         this.startDate = popupRequestDto.getStartDate();
         this.endDate = popupRequestDto.getEndDate();
+        this.openingHours = popupRequestDto.getOpeningHours();
         this.gps = popupRequestDto.getGps();
         this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
@@ -59,9 +69,10 @@ public class PopupStore {
         this.region = region;
     }
 
-    public static PopupStore of(PopupRequestDto popupRequestDto, User user, Region region) {
+    public static PopupStore of(PopupRequestDto popupRequestDto, Category category, User user, Region region) {
         return PopupStore.builder()
                 .popupRequestDto(popupRequestDto)
+                .category(category)
                 .user(user)
                 .region(region)
                 .build();

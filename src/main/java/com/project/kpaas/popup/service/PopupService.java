@@ -43,10 +43,15 @@ public class PopupService {
             throw new CustomException(ErrorCode.AUTHORIZATION);
         }
 
+        Optional<Category> foundCategoryName = categoryRepository.findByCategoryName(popupRequestDto.getCategory());
+        if (foundCategoryName.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CATEGORY);
+        }
+
         Region requestedRegion = Region.from(popupRequestDto);
         Region region = findRegion(popupRequestDto, requestedRegion);
 
-        PopupStore newPopupStore = PopupStore.of(popupRequestDto, userDetails.getUser(), region);
+        PopupStore newPopupStore = PopupStore.of(popupRequestDto, foundCategoryName.get(), userDetails.getUser(), region);
         popupRepository.save(newPopupStore);
         return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
@@ -57,7 +62,7 @@ public class PopupService {
         List<PopupResponseDto> popupResponseDto = new ArrayList<>();
 
         for (PopupStore popupStore : popupStores) {
-            popupResponseDto.add(PopupResponseDto.of(popupStore));
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName()));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
@@ -68,7 +73,7 @@ public class PopupService {
         if (popupStore.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get()));
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName()));
     }
 
     private Region findRegion(PopupRequestDto popupRequestDto, Region requestedRegion) {

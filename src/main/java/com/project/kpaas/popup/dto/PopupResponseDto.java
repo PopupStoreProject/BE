@@ -12,6 +12,7 @@ public class PopupResponseDto {
     private Long id;
     private String popupName;
     private String content;
+    private String category;
     private String startDate;
     private String endDate;
     private String gps;
@@ -19,10 +20,11 @@ public class PopupResponseDto {
     private String homepageUrl;
 
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String startDate, String endDate, String gps, String imageUrl, String homepageUrl) {
+    private PopupResponseDto(Long id, String popupName, String content, String category, String startDate, String endDate, String gps, String imageUrl, String homepageUrl) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
+        this.category = category;
         this.startDate = startDate;
         this.endDate = endDate;
         this.gps = gps;
@@ -30,11 +32,12 @@ public class PopupResponseDto {
         this.homepageUrl = homepageUrl;
     }
 
-    public static PopupResponseDto of(PopupStore popupStore) {
+    public static PopupResponseDto of(PopupStore popupStore, String category) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
                 .content(popupStore.getContent())
+                .category(category)
                 .startDate(popupStore.getStartDate())
                 .endDate(popupStore.getEndDate())
                 .gps(popupStore.getGps())
