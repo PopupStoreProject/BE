@@ -31,6 +31,12 @@ public class PopupStore {
     @Column(nullable = false)
     private String gps;
 
+    @Column(nullable = false)
+    private String imageUrl;
+
+    @Column(nullable = false)
+    private String homepageUrl;
+
     @ManyToOne
     @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
@@ -47,6 +53,8 @@ public class PopupStore {
         this.startDate = popupRequestDto.getStartDate();
         this.endDate = popupRequestDto.getEndDate();
         this.gps = popupRequestDto.getGps();
+        this.imageUrl = popupRequestDto.getImageUrl();
+        this.homepageUrl = popupRequestDto.getHomepageUrl();
         this.user = user;
         this.region = region;
     }
