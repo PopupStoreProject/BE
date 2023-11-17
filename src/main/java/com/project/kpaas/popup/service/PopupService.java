@@ -7,7 +7,9 @@ import com.project.kpaas.popup.dto.MessageResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.entity.PopupStore;
+import com.project.kpaas.popup.entity.Region;
 import com.project.kpaas.popup.repository.PopupRepository;
+import com.project.kpaas.popup.repository.RegionRepository;
 import com.project.kpaas.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import java.util.Optional;
 public class PopupService {
 
     private final PopupRepository popupRepository;
+    private final RegionRepository regionRepository;
 
     @Transactional
     public ResponseEntity<MessageResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
@@ -34,8 +37,10 @@ public class PopupService {
             throw new CustomException(ErrorCode.AUTHORIZATION);
         }
 
-        PopupStore newPopupStore = PopupStore.from(popupRequestDto, userDetails.getUser());
+        Region requestedRegion = Region.from(popupRequestDto);
+        Region region = findRegion(popupRequestDto, requestedRegion);
 
+        PopupStore newPopupStore = PopupStore.of(popupRequestDto, userDetails.getUser(), region);
         popupRepository.save(newPopupStore);
         return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "게시글 등록 완료", newPopupStore.getId()));
     }
@@ -60,5 +65,17 @@ public class PopupService {
         return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get()));
     }
 
+    private Region findRegion(PopupRequestDto popupRequestDto, Region requestedRegion) {
+        return regionRepository.findAll().stream()
+                .filter(region -> region.getRegionName().equals(popupRequestDto.getRegionName()))
+                .findFirst()
+                .map(existingRegion -> {
+                    if (regionRepository.findById(existingRegion.getId()).isEmpty()) {
+                        throw new CustomException(ErrorCode.NOT_FOUND_REGION);
+                    }
+                    return existingRegion;
+                })
+                .orElseGet(() -> regionRepository.save(requestedRegion));
+    }
 
 }
