@@ -20,7 +20,7 @@ public class CategoryService {
 
     @Transactional
     public ResponseEntity<SuccessResponseDto> addCategoryInitialSetting (){
-        // 초기 카테고리 생성용 임시 메서드 -> 추후 팝업 관리자만 카테고리 생성, 수정 가능하도록 변경
+        // 초기 카테고리 생성용 메서드 -> 추후 팝업 관리자만 카테고리 생성, 수정 가능하도록 변경
         String[] categoryNames = {
                 "패션", "뷰티", "음식", "운동",
                 "아트", "엔터", "테크", "환경", "기타"

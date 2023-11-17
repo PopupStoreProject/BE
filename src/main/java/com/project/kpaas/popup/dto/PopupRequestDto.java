@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 public class PopupRequestDto {
     private String popupName;
     private String content;
+    private String category;
     private String startDate;
     private String endDate;
+    private String openingHours;
     private String gps;
     private String regionName;
     private String imageUrl;
