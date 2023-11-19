@@ -62,7 +62,26 @@ public class PopupService {
         return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
-    // 메인페이지 조회
+    // 메인페이지 카테고리 조회
+    @Transactional
+    public ResponseEntity<List<PopupResponseDto>> searchByCategory(String category) {
+        Optional<Category> foundCategory = categoryRepository.findByCategoryName(category);
+        if (foundCategory.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CATEGORY);
+        }
+
+        List<Popupstore> popupStores = popupRepository.findAllByCategory(foundCategory.get());
+        List<PopupResponseDto> popupResponseDto = new ArrayList<>();
+
+        for (Popupstore popupStore : popupStores) {
+            List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.getId());
+            String[] hashtags = getHashtags(foundHashtags);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags));
+        }
+        return ResponseEntity.ok().body(popupResponseDto);
+    }
+
+    // 메인페이지 전체 조회
     @Transactional
     public ResponseEntity<List<PopupResponseDto>> getAllPopups() {
         List<Popupstore> popupStores = popupRepository.findAll();
