@@ -13,7 +13,7 @@ public class SignupRequestDto {
     @Pattern(regexp = "^[a-z0-9]{4,10}", message = "아이디는 소문자 4-10자 이내 입니다.")
     private String username;
 
-    @NotNull(message = "아이디는 필수 값입니다.")
+    @NotNull(message = "이메일은 필수 값입니다.")
     @Pattern(regexp = "^[a-zA-Z0-9\\d`~!@#$%^&*()-_=+]{8,24}$", message = "이메일은 대소문자 및 특수문자 포함 8-24자 입니다.")
     private String email;
 

@@ -43,7 +43,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         try {
             String json = new ObjectMapper().writeValueAsString(ErrorResponse.toResponseEntity(error));
             response.getWriter().write(json);
-            log.error(error.getMsg());
+            log.error(error.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage());
         }
