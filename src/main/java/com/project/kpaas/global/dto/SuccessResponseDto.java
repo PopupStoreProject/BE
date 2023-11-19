@@ -7,19 +7,19 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class SuccessResponseDto {
 
-    private String msg;
-    private int statusCode;
+    private int status;
+    private String message;
 
     @Builder
-    private SuccessResponseDto(String msg, int statusCode) {
-        this.msg = msg;
-        this.statusCode = statusCode;
+    private SuccessResponseDto(String message, int status) {
+        this.status = status;
+        this.message = message;
     }
 
-    public static SuccessResponseDto of(String msg, HttpStatus status) {
+    public static SuccessResponseDto of(String message, HttpStatus status) {
         return SuccessResponseDto.builder()
-                .msg(msg)
-                .statusCode(status.value())
+                .status(status.value())
+                .message(message)
                 .build();
     }
 

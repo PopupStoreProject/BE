@@ -24,6 +24,6 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효한 토큰이 아닙니다.");
 
     private final HttpStatus httpStatus;
-    private final String msg;
+    private final String message;
 
 }
