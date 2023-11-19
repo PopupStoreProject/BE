@@ -30,6 +30,11 @@ public class PopupController {
         return popupService.getAllPopups();
     }
 
+    @GetMapping("/category")
+    public ResponseEntity<List<PopupResponseDto>> categorySearch(@RequestParam(value = "c") String category) {
+        return popupService.searchByCategory(category);
+    }
+
     @GetMapping("/popup/{id}")
     public ResponseEntity<PopupResponseDto> popupGet(@PathVariable Long id) {
         return popupService.getPopup(id);
