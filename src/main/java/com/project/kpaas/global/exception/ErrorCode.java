@@ -14,6 +14,7 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "회원을 찾을 수 없습니다."),
     NOT_FOUND_POPUP(HttpStatus.BAD_REQUEST, "해당 팝업스토어를 찾을 수 없습니다."),
     NOT_FOUND_CATEGORY(HttpStatus.BAD_REQUEST, "해당 카테고리를 찾을 수 없습니다."),
+    NOT_FOUND_HASHTAG(HttpStatus.BAD_REQUEST, "해당 해시태그를 찾을 수 없습니다."),
     NOT_FOUND_REGION(HttpStatus.BAD_REQUEST, "해당 지역을 찾을 수 없습니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "중복된 닉네임이 있습니다."),
 
