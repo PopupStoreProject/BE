@@ -9,6 +9,7 @@ public class PopupRequestDto {
     private String popupName;
     private String content;
     private String category;
+    private String[] hashtags;
     private String startDate;
     private String endDate;
     private String openingHours;

@@ -1,15 +1,16 @@
 package com.project.kpaas.popup.service;
 
 import com.project.kpaas.classification.entity.Category;
+import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
-import com.project.kpaas.classification.service.CategoryService;
+import com.project.kpaas.classification.repository.HashtagRepository;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.popup.dto.MessageResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
-import com.project.kpaas.popup.entity.PopupStore;
+import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.popup.repository.RegionRepository;
@@ -21,10 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -34,6 +32,7 @@ public class PopupService {
     private final PopupRepository popupRepository;
     private final RegionRepository regionRepository;
     private final CategoryRepository categoryRepository;
+    private final HashtagRepository hashtagRepository;
 
 
     @Transactional
@@ -51,29 +50,51 @@ public class PopupService {
         Region requestedRegion = Region.from(popupRequestDto);
         Region region = findRegion(popupRequestDto, requestedRegion);
 
-        PopupStore newPopupStore = PopupStore.of(popupRequestDto, foundCategoryName.get(), userDetails.getUser(), region);
+        Popupstore newPopupStore = Popupstore.of(popupRequestDto, foundCategoryName.get(), userDetails.getUser(), region);
+        Set<String> hashtags = new HashSet<>(Arrays.asList(popupRequestDto.getHashtags()));
+
+        for (String h : hashtags) {
+            Hashtag hashtag = Hashtag.of(h);
+            hashtag.addToPopupStore(newPopupStore);
+        }
+
         popupRepository.save(newPopupStore);
         return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
+    // 메인페이지 조회
     @Transactional
     public ResponseEntity<List<PopupResponseDto>> getAllPopups() {
-        List<PopupStore> popupStores = popupRepository.findAll();
+        List<Popupstore> popupStores = popupRepository.findAll();
         List<PopupResponseDto> popupResponseDto = new ArrayList<>();
 
-        for (PopupStore popupStore : popupStores) {
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName()));
+        for (Popupstore popupStore : popupStores) {
+            List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.getId());
+            String[] hashtags = getHashtags(foundHashtags);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
 
+    // 상세페이지 조회
     @Transactional
     public ResponseEntity<PopupResponseDto> getPopup(Long id) {
-        Optional<PopupStore> popupStore = popupRepository.findById(id);
+        Optional<Popupstore> popupStore = popupRepository.findById(id);
         if (popupStore.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName()));
+
+        List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
+        String[] hashtags = getHashtags(foundHashtags);
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags));
+    }
+
+    private static String[] getHashtags(List<Hashtag> foundHashtags) {
+        if (foundHashtags.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_HASHTAG);
+        }
+        String[] hashtags = foundHashtags.stream().map(Hashtag::getContent).toArray(String[]::new);
+        return hashtags;
     }
 
     private Region findRegion(PopupRequestDto popupRequestDto, Region requestedRegion) {
