@@ -1,8 +1,13 @@
 package com.project.kpaas.user.service;
 
+import com.project.kpaas.classification.entity.Category;
+import com.project.kpaas.classification.repository.CategoryRepository;
 import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.exception.CustomException;
+import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.util.JwtUtil;
+import com.project.kpaas.mypage.entity.CategoryPreference;
+import com.project.kpaas.mypage.repository.CategoryPreferenceRepository;
 import com.project.kpaas.user.dto.LoginRequestDto;
 import com.project.kpaas.user.dto.SignupRequestDto;
 import com.project.kpaas.user.repository.UserRepository;
@@ -17,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 import static com.project.kpaas.global.exception.ErrorCode.*;
@@ -26,6 +32,8 @@ import static com.project.kpaas.global.exception.ErrorCode.*;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final CategoryPreferenceRepository categoryPreferenceRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -54,6 +62,16 @@ public class UserService {
 
         User user = User.of(username, email, password, role);
         userRepository.save(user);
+
+        List<String> categoryPreference = signupRequestDto.getCategoryPreference();
+        for (String category : categoryPreference) {
+            Optional<Category> foundCategory = categoryRepository.findByCategoryName(category);
+            if (foundCategory.isEmpty()) {
+                throw new CustomException(NOT_FOUND_CATEGORY);
+            }
+            categoryPreferenceRepository.save(CategoryPreference.of(user, foundCategory.get()));
+        }
+
         return ResponseEntity.ok()
                 .body(SuccessResponseDto.of("회원가입 완료", HttpStatus.OK));
     }
