@@ -36,7 +36,6 @@ public class MypageResponseDto {
     public static MypageResponseDto from(User user){
         return MypageResponseDto.builder()
                 .userName(user.getUsername())
-//                .categoryPreference(categoryPreference)
                 .build();
     }
 }
