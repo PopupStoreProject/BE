@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.project.kpaas.global.exception.ErrorCode.NOT_FOUND_CATEGORY;
+
 
 @Service
 @Slf4j
@@ -71,8 +73,28 @@ public class MypageService {
         if(foundUser.isEmpty()){
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
-
         foundUser.get().update(mypageRequestDto);
+
+        List<String> newCategoryPreference = mypageRequestDto.getCategoryPreference();
+        List<CategoryPreference> foundCategoryPreferences = categoryPreferenceRepository.findAllByUserId(foundUser.get().getId());
+
+        for (CategoryPreference existingPreference : foundCategoryPreferences) {
+            String existingCategory = existingPreference.getCategory().getCategoryName();
+            if (!newCategoryPreference.contains(existingCategory)) {
+                categoryPreferenceRepository.delete(existingPreference);
+            }
+        }
+
+        for (String newCategory : newCategoryPreference) {
+            if (foundCategoryPreferences.stream().noneMatch(c -> c.getCategory().getCategoryName().equals(newCategory))) {
+                Optional<Category> foundCategory = categoryRepository.findByCategoryName(newCategory);
+                if (foundCategory.isEmpty()) {
+                    throw new CustomException(NOT_FOUND_CATEGORY);
+                }
+                categoryPreferenceRepository.save(CategoryPreference.of(user, foundCategory.get()));
+            }
+        }
+
         return SuccessResponseDto.of("수정이 완료 되었습니다.", HttpStatus.OK);
     }
 
