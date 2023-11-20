@@ -1,10 +1,13 @@
 package com.project.kpaas.user.entity;
 
+import com.project.kpaas.classification.entity.Hashtag;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "users")
 @Getter
