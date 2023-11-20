@@ -2,6 +2,7 @@ package com.project.kpaas.mypage.service;
 
 import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.repository.CategoryRepository;
+import com.project.kpaas.mypage.dto.MypageRequestDto;
 import com.project.kpaas.mypage.dto.MypageResponseDto;
 import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.exception.CustomException;
@@ -62,6 +63,17 @@ public class MypageService {
                 .collect(Collectors.toList());
 
         return MypageResponseDto.from(foundUser.get(), foundCategories.toArray(String[]::new), bookmarkedPopups.toArray(Object[]::new));
+    }
+
+    @Transactional
+    public SuccessResponseDto updateMyInfo(MypageRequestDto mypageRequestDto, User user) {
+        Optional<User> foundUser = userRepository.findById(user.getId());
+        if(foundUser.isEmpty()){
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+
+        foundUser.get().update(mypageRequestDto);
+        return SuccessResponseDto.of("수정이 완료 되었습니다.", HttpStatus.OK);
     }
 
     @Transactional

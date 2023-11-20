@@ -1,13 +1,11 @@
 package com.project.kpaas.user.entity;
 
-import com.project.kpaas.classification.entity.Hashtag;
+import com.project.kpaas.mypage.dto.MypageRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity(name = "users")
 @Getter
@@ -46,6 +44,13 @@ public class User {
                 .password(password)
                 .role(role)
                 .build();
+    }
+
+    public void update(MypageRequestDto mypageRequestDto) {
+        String newUsername = mypageRequestDto.getUsername();
+        if (newUsername != null) {
+            this.username = newUsername;
+        }
     }
 
 }

@@ -32,4 +32,11 @@ public class MypageResponseDto {
                 .bookmarkedPopups(bookmarkedPopups)
                 .build();
     }
+
+    public static MypageResponseDto from(User user){
+        return MypageResponseDto.builder()
+                .userName(user.getUsername())
+//                .categoryPreference(categoryPreference)
+                .build();
+    }
 }

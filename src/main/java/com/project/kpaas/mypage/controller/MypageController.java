@@ -1,5 +1,6 @@
 package com.project.kpaas.mypage.controller;
 
+import com.project.kpaas.mypage.dto.MypageRequestDto;
 import com.project.kpaas.mypage.dto.MypageResponseDto;
 import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.security.UserDetailsImpl;
@@ -18,6 +19,11 @@ public class MypageController {
     @GetMapping("/mypage")
     public MypageResponseDto myInfoGet(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return mypageService.getMyInfo(userDetails.getUser());
+    }
+
+    @PutMapping("/mypage/edit")
+    public SuccessResponseDto myInfoUpdate(MypageRequestDto mypageRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return mypageService.updateMyInfo(mypageRequestDto, userDetails.getUser());
     }
 
     @PutMapping("/bookmark/{id}")
