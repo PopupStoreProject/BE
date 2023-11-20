@@ -16,6 +16,7 @@ public enum ErrorCode {
     NOT_FOUND_CATEGORY(HttpStatus.BAD_REQUEST, "해당 카테고리를 찾을 수 없습니다."),
     NOT_FOUND_HASHTAG(HttpStatus.BAD_REQUEST, "해당 해시태그를 찾을 수 없습니다."),
     NOT_FOUND_REGION(HttpStatus.BAD_REQUEST, "해당 지역을 찾을 수 없습니다."),
+    NOT_FOUND_EDITION(HttpStatus.BAD_REQUEST, "수정할 카테고리를 하나 이상 지정해 주세요."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "중복된 닉네임이 있습니다."),
 
     INVALID_ADMIN_TOKEN(HttpStatus.BAD_REQUEST, "유효한 관리자 토큰이 아닙니다."),
