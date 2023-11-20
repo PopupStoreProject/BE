@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface CategoryPreferenceRepository extends JpaRepository<CategoryPreference, Long> {
 
     List<CategoryPreference> findAllByUserId(Long userId);
+
+    void deleteAllByUserId(Long userId);
 }
