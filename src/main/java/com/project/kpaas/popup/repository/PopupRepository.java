@@ -12,4 +12,6 @@ public interface PopupRepository extends JpaRepository<Popupstore, Long> {
     Optional<Popupstore> findById(Long popupId);
 
     List<Popupstore> findAllByCategory(Category category);
+
+    List<Popupstore> findAllByUserId(Long usesrId);
 }
