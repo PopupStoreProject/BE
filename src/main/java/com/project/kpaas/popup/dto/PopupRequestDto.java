@@ -13,7 +13,8 @@ public class PopupRequestDto {
     private String startDate;
     private String endDate;
     private String openingHours;
-    private String gps;
+    private Double latitude;   //위도
+    private  Double longitude;  //경도
     private String regionName;
     private String imageUrl;
     private String homepageUrl;
