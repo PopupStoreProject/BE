@@ -4,6 +4,7 @@ import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
 import com.project.kpaas.classification.repository.HashtagRepository;
+import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
@@ -106,6 +107,53 @@ public class PopupService {
         List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] hashtags = getHashtags(foundHashtags);
         return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags));
+    }
+
+    @Transactional
+    public ResponseEntity<SuccessResponseDto> updatePopup(Long id, PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
+
+        if (userDetails.getUser().getRole() == UserRole.USER) {
+            throw new CustomException(ErrorCode.AUTHORIZATION);
+        }
+
+        Optional<Popupstore> foundPopupstore = popupRepository.findById(id);
+        if (foundPopupstore.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
+        }
+
+        List<Hashtag> currentHashtags = hashtagRepository.findAllByPopupstoreId(foundPopupstore.get().getId());
+        List<String> inputHastags = new ArrayList<>(Arrays.asList(popupRequestDto.getHashtags()));
+        List<String> newHashtags = new ArrayList<>();
+
+        for (Hashtag hashtag : currentHashtags) {
+            if(!inputHastags.contains(hashtag.getContent())){
+                hashtagRepository.delete(hashtag);
+            }
+            newHashtags.add(hashtag.getContent());
+        }
+
+        for (String input : inputHastags) {
+            if(!newHashtags.contains(input)){
+                Hashtag hashtag = Hashtag.of(input);
+                hashtag.addToPopupStore(foundPopupstore.get());
+                hashtagRepository.save(hashtag);
+            }
+        }
+
+        Optional<Category> category = categoryRepository.findByCategoryName(popupRequestDto.getCategory());
+        if (category.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CATEGORY);
+        }
+
+        Optional<Region> region = regionRepository.findById(foundPopupstore.get().getRegion().getId());
+        if (region.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_REGION);
+        }
+        region.get().update(popupRequestDto);
+
+        foundPopupstore.get().update(popupRequestDto, category.get(), region.get());
+
+        return ResponseEntity.ok().body(SuccessResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
     }
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
