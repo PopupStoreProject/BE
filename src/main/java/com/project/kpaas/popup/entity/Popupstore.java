@@ -97,4 +97,16 @@ public class Popupstore {
         log.info("Point 변환 후 좌표 y :{}", location.getY());
         return location;
     }
+
+    public void update(PopupRequestDto popupRequestDto, Category category, Region region) {
+        this.popupName = popupRequestDto.getPopupName();
+        this.content = popupRequestDto.getContent();
+        this.category = category;
+        this.startDate = popupRequestDto.getStartDate();
+        this.endDate = popupRequestDto.getEndDate();
+        this.openingHours = popupRequestDto.getOpeningHours();
+        this.setGps(popupRequestDto.getLatitude(), popupRequestDto.getLongitude());
+        this.imageUrl = popupRequestDto.getImageUrl();
+        this.homepageUrl = popupRequestDto.getHomepageUrl();
+    }
 }
