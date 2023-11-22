@@ -1,5 +1,6 @@
 package com.project.kpaas.popup.controller;
 
+import com.project.kpaas.global.dto.SuccessResponseDto;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.popup.dto.MessageResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
@@ -40,5 +41,9 @@ public class PopupController {
         return popupService.getPopup(id);
     }
 
+    @PutMapping("/popup/{id}")
+    public ResponseEntity<SuccessResponseDto> popupUpdate(@PathVariable Long id, @RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.updatePopup(id, popupRequestDto, userDetails);
+    }
 
 }
