@@ -31,4 +31,8 @@ public class Region {
                 .build();
     }
 
+    public void update(PopupRequestDto popupRequestDto) {
+        this.regionName = popupRequestDto.getRegionName();
+    }
+
 }

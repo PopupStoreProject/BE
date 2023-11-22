@@ -1,5 +1,6 @@
 package com.project.kpaas.classification.entity;
 
+import com.project.kpaas.popup.dto.PopupRequestDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
