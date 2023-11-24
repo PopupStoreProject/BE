@@ -1,8 +1,8 @@
 package com.project.kpaas.popup.controller;
 
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.security.UserDetailsImpl;
-import com.project.kpaas.popup.dto.MessageResponseDto;
+import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.service.PopupService;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import com.project.kpaas.user.entity.User;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class PopupController {
     private final PopupService popupService;
 
     @PostMapping("/popup")
-    public ResponseEntity<MessageResponseDto> popupAdd(@RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<PopupMsgResponseDto> popupAdd(@RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return popupService.addPopup(popupRequestDto, userDetails);
     }
 
@@ -42,8 +41,13 @@ public class PopupController {
     }
 
     @PutMapping("/popup/{id}")
-    public ResponseEntity<SuccessResponseDto> popupUpdate(@PathVariable Long id, @RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> popupUpdate(@PathVariable Long id, @RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return popupService.updatePopup(id, popupRequestDto, userDetails);
+    }
+
+    @DeleteMapping("/popup/{id}")
+    public ResponseEntity<MessageResponseDto> popupDelete(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.deletePopup(id, userDetails.getUser());
     }
 
 }

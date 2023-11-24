@@ -2,7 +2,7 @@ package com.project.kpaas.mypage.controller;
 
 import com.project.kpaas.mypage.dto.MypageRequestDto;
 import com.project.kpaas.mypage.dto.MypageResponseDto;
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.mypage.service.MypageService;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,12 @@ public class MypageController {
     }
 
     @PutMapping("/mypage/edit")
-    public SuccessResponseDto myInfoUpdate(MypageRequestDto mypageRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public MessageResponseDto myInfoUpdate(MypageRequestDto mypageRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return mypageService.updateMyInfo(mypageRequestDto, userDetails.getUser());
     }
 
     @PutMapping("/bookmark/{id}")
-    public ResponseEntity<SuccessResponseDto> bookmarkRegister(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> bookmarkRegister(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return mypageService.pushLike(id, userDetails.getUser());
     }
 
