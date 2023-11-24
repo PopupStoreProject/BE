@@ -20,9 +20,10 @@ public class PopupResponseDto {
     private  Double longitude;  //경도
     private String imageUrl;
     private String homepageUrl;
+    private String instagramUrl;
 
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String imageUrl, String homepageUrl) {
+    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String imageUrl, String homepageUrl, String instagramUrl) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
@@ -34,6 +35,7 @@ public class PopupResponseDto {
         this.longitude = longitude;
         this.imageUrl = imageUrl;
         this.homepageUrl = homepageUrl;
+        this.instagramUrl = instagramUrl;
     }
 
     public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags) {
@@ -49,6 +51,7 @@ public class PopupResponseDto {
                 .longitude(popupStore.getGps().y)
                 .imageUrl(popupStore.getImageUrl())
                 .homepageUrl(popupStore.getHomepageUrl())
+                .instagramUrl(popupStore.getInstagramUrl())
                 .build();
     }
 

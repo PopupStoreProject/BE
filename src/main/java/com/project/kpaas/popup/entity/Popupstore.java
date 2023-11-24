@@ -47,6 +47,9 @@ public class Popupstore {
     @Column(nullable = false)
     private String homepageUrl;
 
+    @Column(nullable = true)
+    private String instagramUrl;
+
     @ManyToOne
     @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
@@ -64,7 +67,7 @@ public class Popupstore {
 
 
     @Builder
-    private Popupstore(PopupRequestDto popupRequestDto, Category category, User user, Region region) {
+    private Popupstore(PopupRequestDto popupRequestDto, Category category, User user, Region region, String instagramUrl) {
         this.popupName = popupRequestDto.getPopupName();
         this.content = popupRequestDto.getContent();
         this.category = category;
@@ -74,6 +77,7 @@ public class Popupstore {
         this.gps = setGps(popupRequestDto.getLatitude(), popupRequestDto.getLongitude());
         this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
+        this.instagramUrl = popupRequestDto.getInstagramUrl();
         this.user = user;
         this.region = region;
     }
@@ -109,6 +113,5 @@ public class Popupstore {
         this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
     }
-
 
 }

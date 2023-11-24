@@ -18,4 +18,5 @@ public class PopupRequestDto {
     private String regionName;
     private String imageUrl;
     private String homepageUrl;
+    private String instagramUrl;
 }
