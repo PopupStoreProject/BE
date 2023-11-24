@@ -1,7 +1,7 @@
 package com.project.kpaas.classification.controller;
 
 import com.project.kpaas.classification.service.CategoryService;
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/category")
-    public ResponseEntity<SuccessResponseDto> categoryInitialSettingAdd(){
+    public ResponseEntity<MessageResponseDto> categoryInitialSettingAdd(){
         return categoryService.addCategoryInitialSetting();
     }
 }

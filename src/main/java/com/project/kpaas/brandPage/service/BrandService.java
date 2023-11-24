@@ -4,7 +4,7 @@ import com.project.kpaas.brandPage.dto.BrandRequestDto;
 import com.project.kpaas.brandPage.dto.BrandResponseDto;
 import com.project.kpaas.brandPage.entity.Brand;
 import com.project.kpaas.brandPage.repository.BrandRepository;
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
@@ -32,13 +32,13 @@ public class BrandService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ResponseEntity<SuccessResponseDto> addBrandInfo(BrandRequestDto brandRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> addBrandInfo(BrandRequestDto brandRequestDto, UserDetailsImpl userDetails) {
         if (userDetails.getUser().getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
         }
 
         brandRepository.save(Brand.of(brandRequestDto, userDetails.getUser()));
-        return ResponseEntity.ok().body(SuccessResponseDto.of( "브랜드 정보 등록 완료", HttpStatus.OK));
+        return ResponseEntity.ok().body(MessageResponseDto.of( "브랜드 정보 등록 완료", HttpStatus.OK));
     }
 
     @Transactional

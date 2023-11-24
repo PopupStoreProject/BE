@@ -4,7 +4,7 @@ import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.repository.CategoryRepository;
 import com.project.kpaas.mypage.dto.MypageRequestDto;
 import com.project.kpaas.mypage.dto.MypageResponseDto;
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.mypage.entity.Bookmark;
@@ -68,7 +68,7 @@ public class MypageService {
     }
 
     @Transactional
-    public SuccessResponseDto updateMyInfo(MypageRequestDto mypageRequestDto, User user) {
+    public MessageResponseDto updateMyInfo(MypageRequestDto mypageRequestDto, User user) {
         Optional<User> foundUser = userRepository.findById(user.getId());
         if(foundUser.isEmpty()){
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
@@ -95,11 +95,11 @@ public class MypageService {
             }
         }
 
-        return SuccessResponseDto.of("수정이 완료 되었습니다.", HttpStatus.OK);
+        return MessageResponseDto.of("수정이 완료 되었습니다.", HttpStatus.OK);
     }
 
     @Transactional
-    public ResponseEntity<SuccessResponseDto> pushLike(Long id, User user) {
+    public ResponseEntity<MessageResponseDto> pushLike(Long id, User user) {
 
         Optional<Popupstore> foundPopupstore = popupRepository.findById(id);
         if (foundPopupstore.isEmpty()) {
@@ -112,10 +112,10 @@ public class MypageService {
         if (bookmark.isEmpty()) {
             Bookmark newBookmark = Bookmark.of(foundPopupstore.get(), foundMember.get());
             bookmarkRepository.save(newBookmark);
-            return ResponseEntity.ok().body(SuccessResponseDto.of("즐겨찾기 추가", HttpStatus.OK));
+            return ResponseEntity.ok().body(MessageResponseDto.of("즐겨찾기 추가", HttpStatus.OK));
         } else {
             bookmarkRepository.deleteByPopupstoreId(foundPopupstore.get().getId());
-            return ResponseEntity.ok().body(SuccessResponseDto.of("즐겨찾기 취소", HttpStatus.OK));
+            return ResponseEntity.ok().body(MessageResponseDto.of("즐겨찾기 취소", HttpStatus.OK));
         }
     }
 

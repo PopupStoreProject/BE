@@ -1,6 +1,6 @@
 package com.project.kpaas.global.exception;
 
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +13,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<SuccessResponseDto> methodValidException(MethodArgumentNotValidException e) {
-        SuccessResponseDto responseDto = makeErrorResponse(e.getBindingResult());
+    public ResponseEntity<MessageResponseDto> methodValidException(MethodArgumentNotValidException e) {
+        MessageResponseDto responseDto = makeErrorResponse(e.getBindingResult());
         return ResponseEntity.badRequest().body(responseDto);
     }
 
-    private SuccessResponseDto makeErrorResponse(BindingResult bindingResult) {
+    private MessageResponseDto makeErrorResponse(BindingResult bindingResult) {
         String message = "";
         if (bindingResult.hasErrors()) {
             message = bindingResult.getAllErrors().get(0).getDefaultMessage();
         }
-        return SuccessResponseDto.of(message, HttpStatus.BAD_REQUEST);
+        return MessageResponseDto.of(message, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {CustomException.class})
