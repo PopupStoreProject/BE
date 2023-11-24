@@ -4,15 +4,16 @@ import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
 import com.project.kpaas.classification.repository.HashtagRepository;
-import com.project.kpaas.global.dto.SuccessResponseDto;
+import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
-import com.project.kpaas.popup.dto.MessageResponseDto;
+import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
+import com.project.kpaas.user.entity.User;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.popup.repository.RegionRepository;
 import com.project.kpaas.user.entity.UserRole;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -37,7 +39,7 @@ public class PopupService {
 
 
     @Transactional
-    public ResponseEntity<MessageResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<PopupMsgResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
 
         if (userDetails.getUser().getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
@@ -60,7 +62,7 @@ public class PopupService {
         }
 
         popupRepository.save(newPopupStore);
-        return ResponseEntity.ok().body(MessageResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
+        return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
     // 메인페이지 카테고리 조회
@@ -110,7 +112,7 @@ public class PopupService {
     }
 
     @Transactional
-    public ResponseEntity<SuccessResponseDto> updatePopup(Long id, PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> updatePopup(Long id, PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
 
         if (userDetails.getUser().getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
@@ -153,7 +155,7 @@ public class PopupService {
 
         foundPopupstore.get().update(popupRequestDto, category.get(), region.get());
 
-        return ResponseEntity.ok().body(SuccessResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
+        return ResponseEntity.ok().body(MessageResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
     }
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
@@ -162,6 +164,22 @@ public class PopupService {
         }
         String[] hashtags = foundHashtags.stream().map(Hashtag::getContent).toArray(String[]::new);
         return hashtags;
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponseDto> deletePopup(Long id, User user) {
+
+        if (user.getRole() == UserRole.USER) {
+            throw new CustomException(ErrorCode.AUTHORIZATION);
+        }
+
+        Optional<Popupstore> popupstore = popupRepository.findByIdAndUser(id, user);
+        if (popupstore.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
+        }
+
+        popupRepository.deleteById(popupstore.get().getId());
+        return ResponseEntity.ok().body(MessageResponseDto.of("삭제가 완료되었습니다.", HttpStatus.OK));
     }
 
     private Region findRegion(PopupRequestDto popupRequestDto, Region requestedRegion) {
