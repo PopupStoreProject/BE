@@ -67,7 +67,7 @@ public class Popupstore {
 
 
     @Builder
-    private Popupstore(PopupRequestDto popupRequestDto, Category category, User user, Region region, String instagramUrl) {
+    private Popupstore(PopupRequestDto popupRequestDto, Category category, User user, Region region) {
         this.popupName = popupRequestDto.getPopupName();
         this.content = popupRequestDto.getContent();
         this.category = category;
@@ -113,5 +113,6 @@ public class Popupstore {
         this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
     }
+
 
 }

@@ -1,7 +1,5 @@
 package com.project.kpaas.popup.service;
 
-import com.project.kpaas.brandPage.dto.BrandResponseDto;
-import com.project.kpaas.brandPage.repository.BrandRepository;
 import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
