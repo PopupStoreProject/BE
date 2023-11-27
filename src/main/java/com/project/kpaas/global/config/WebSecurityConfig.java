@@ -68,7 +68,13 @@ public class WebSecurityConfig {
 
         httpSecurity.authorizeRequests().antMatchers("/signup").permitAll()
                 .antMatchers("/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/popup/**").permitAll()
+                .antMatchers( "/popup").permitAll()
+                .antMatchers( "/popups").permitAll()
+                .antMatchers( "/admin").permitAll()
+                .antMatchers( "/brand").permitAll()
+                .antMatchers( "/mypage").permitAll()
+                .antMatchers( "/bookmark").permitAll()
+                .antMatchers( HttpMethod.GET, "/category").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);

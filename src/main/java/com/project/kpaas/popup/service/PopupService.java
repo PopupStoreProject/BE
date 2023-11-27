@@ -13,8 +13,10 @@ import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
+import com.project.kpaas.popup.entity.BlogReview;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
+import com.project.kpaas.popup.repository.BlogRepsitory;
 import com.project.kpaas.user.entity.User;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.popup.repository.RegionRepository;
@@ -38,6 +40,7 @@ public class PopupService {
     private final RegionRepository regionRepository;
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
+    private final BlogRepsitory blogRepsitory;
 
 
     @Transactional
@@ -108,9 +111,11 @@ public class PopupService {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
 
+        List<BlogReview> blogReviews = blogRepsitory.findAllByPopupstoreId(popupStore.get().getId());
+
         List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] hashtags = getHashtags(foundHashtags);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags));
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReviews.toArray(Object[]::new)));
     }
 
     @Transactional
