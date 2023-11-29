@@ -1,5 +1,7 @@
 package com.project.kpaas.popup.service;
 
+import com.project.kpaas.brandPage.dto.BrandResponseDto;
+import com.project.kpaas.brandPage.repository.BrandRepository;
 import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
@@ -11,14 +13,15 @@ import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
-import com.project.kpaas.popup.entity.BlogReview;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
-import com.project.kpaas.popup.repository.BlogRepsitory;
 import com.project.kpaas.user.entity.User;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.popup.repository.RegionRepository;
 import com.project.kpaas.user.entity.UserRole;
+import java.awt.geom.Point2D;
+import javax.persistence.Query;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,7 +41,7 @@ public class PopupService {
     private final RegionRepository regionRepository;
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
-    private final BlogRepsitory blogRepsitory;
+    private final EntityManager entityManager;
 
 
     @Transactional
@@ -109,11 +112,9 @@ public class PopupService {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
 
-        List<BlogReview> blogReviews = blogRepsitory.findAllByPopupstoreId(popupStore.get().getId());
-
         List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] hashtags = getHashtags(foundHashtags);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReviews.toArray(Object[]::new)));
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags));
     }
 
     @Transactional
@@ -198,6 +199,33 @@ public class PopupService {
                     return existingRegion;
                 })
                 .orElseGet(() -> regionRepository.save(requestedRegion));
+    }
+
+
+    // 반경과 현재 위치 가지고, MySQL에서 좌표 가져오는 코드
+    public List<PopupResponseDto> searchByRadius(double lat, double lon, double radius) {
+//        String queryString = "SELECT p.id, p.popup_name, p.content, " +
+//                "p.start_date, p.end_date, p.gps, p.image_url, " +
+//                "p.homepage_url, p.instagram_url, c.category_name " +
+//                "FROM popup_store p " +
+//                "JOIN category c ON p.category_id = c.id " +
+//                "WHERE ST_Distance_Sphere(Point(:centerX, :centerY), p.gps <= :radius";
+
+        // 우선, 간단하게 id, popup_name, gps정보만 가지고오도록 함
+        String queryString = "SELECT p.id, p.popup_name, p.gps" +
+                "WHERE ST_Distance_Sphere(Point(:centerX, :centerY), p.gps <= :radius";
+
+        // Native Query
+        Query query = entityManager.createNativeQuery(queryString, PopupResponseDto.class);
+
+        // SQL문 파라미터 설정
+        query.setParameter("centerX", lat);
+        query.setParameter("centerY", lon);
+        query.setParameter("radius", radius);
+
+        List<PopupResponseDto> popupResponseDtoList = query.getResultList();
+        return ResponseEntity.ok().body(popupResponseDtoList);
+
     }
 
 }
