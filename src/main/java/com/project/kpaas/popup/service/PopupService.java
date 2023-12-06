@@ -20,8 +20,10 @@ import com.project.kpaas.user.entity.User;
 import com.project.kpaas.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -39,6 +41,7 @@ public class PopupService {
     private final HashtagRepository hashtagRepository;
     private final BlogRepsitory blogRepsitory;
     private final ClientUtil clientUtil;
+    private static final double EARTH_RADIUS = 6371;
 
 
     @Transactional
@@ -166,20 +169,49 @@ public class PopupService {
 
     // 반경과 현재 위치 가지고, MySQL에서 좌표 가져오는 코드
     public ResponseEntity<List<PopupResponseDto>> searchByRadius(double lat, double lon, double radius) {
-        List<Popupstore> popupsByRadius = popupRepositoryImpl.findAllByGps(lat, lon, radius);
-        if (popupsByRadius.isEmpty()) {
+        List<Popupstore> allPopups = popupRepository.findAll();
+        if (allPopups.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
 
         List<PopupResponseDto> popupResponseDto = new ArrayList<>();
-        for (Popupstore p : popupsByRadius) {
-            List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(p.getId());
-            String[] hashtags = getHashtags(foundHashtags);
-            popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags));
+        for (Popupstore p : allPopups) {
+            double popupLat = p.getGps().getX();
+            double popupLon = p.getGps().getY();
+            double distance = distance(popupLat, popupLon, lat, lon);
+            if (distance <= radius) {
+                List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(p.getId());
+                String[] hashtags = getHashtags(foundHashtags);
+                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags));
+            } else {
+                throw new CustomException(ErrorCode.NOT_FOUND_NEAR_POPUP);
+            }
         }
 
         return ResponseEntity.ok().body(popupResponseDto);
     }
+
+    // 두 거리 사이 구해서 반경이 해당 범위 안이면 ok
+    private static double distance(double lat1, double lon1, double lat2, double lon2) {
+
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1.609344;;
+
+        return dist;
+    }
+
+    private static double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private static double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
+    }
+
 
 
 

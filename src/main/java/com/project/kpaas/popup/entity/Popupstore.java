@@ -9,8 +9,11 @@ import lombok.Getter;
 import com.project.kpaas.user.entity.User;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
 import javax.persistence.*;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +41,8 @@ public class Popupstore {
     @Column(nullable = false)
     private String openingHours;
 
-    @Column(nullable = false)
-    private Point2D.Double gps;
+    @Column(nullable = false, columnDefinition = "MEDIUMBLOB")
+    private Point gps;
 
     @Column(nullable = false)
     private String imageUrl;
@@ -91,10 +94,9 @@ public class Popupstore {
                 .build();
     }
 
-    private Point2D.Double setGps(double latitude, double longitude){
-        Point2D.Double location = new Point2D.Double();
+    private Point setGps(double latitude, double longitude){
+        Point location = new GeometryFactory().createPoint(new Coordinate(latitude, longitude));
         log.info("위도: {}, 경도 {}",latitude,longitude);
-        location.setLocation(latitude,longitude);
         log.info("----------------------------");
         log.info("Point 변환 후 좌표 :{}", location.toString());
         log.info("Point 변환 후 좌표 x :{}", location.getX());
@@ -113,6 +115,5 @@ public class Popupstore {
         this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
     }
-
 
 }
