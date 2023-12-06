@@ -1,6 +1,7 @@
 package com.project.kpaas.popup.repository;
 
 import com.project.kpaas.classification.entity.Category;
+import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,5 @@ public interface PopupRepository extends JpaRepository<Popupstore, Long> {
     List<Popupstore> findAllByUserId(Long usesrId);
 
     void deleteById(Long id);
+
 }

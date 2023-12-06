@@ -15,6 +15,7 @@ import com.project.kpaas.popup.entity.BlogReview;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
 import com.project.kpaas.popup.repository.BlogRepsitory;
+import com.project.kpaas.popup.repository.PopupRepositoryImpl;
 import com.project.kpaas.user.entity.User;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.popup.repository.RegionRepository;
@@ -25,7 +26,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -35,6 +35,7 @@ import java.util.*;
 public class PopupService {
 
     private final PopupRepository popupRepository;
+    private final PopupRepositoryImpl popupRepositoryImpl;
     private final RegionRepository regionRepository;
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
@@ -161,6 +162,23 @@ public class PopupService {
         foundPopupstore.get().update(popupRequestDto, category.get(), region.get());
 
         return ResponseEntity.ok().body(MessageResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
+    }
+
+    // 반경과 현재 위치 가지고, MySQL에서 좌표 가져오는 코드
+    public ResponseEntity<List<PopupResponseDto>> searchByRadius(double lat, double lon, double radius) {
+        List<Popupstore> popupsByRadius = popupRepositoryImpl.findAllByGps(lat, lon, radius);
+        if (popupsByRadius.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
+        }
+
+        List<PopupResponseDto> popupResponseDto = new ArrayList<>();
+        for (Popupstore p : popupsByRadius) {
+            List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(p.getId());
+            String[] hashtags = getHashtags(foundHashtags);
+            popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags));
+        }
+
+        return ResponseEntity.ok().body(popupResponseDto);
     }
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
