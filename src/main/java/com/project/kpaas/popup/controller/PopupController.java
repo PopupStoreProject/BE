@@ -21,7 +21,7 @@ public class PopupController {
     private final PopupService popupService;
 
     @PostMapping("/popup")
-    public ResponseEntity<PopupMsgResponseDto> popupAdd(@RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<PopupMsgResponseDto> popupAdd(@RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
         return popupService.addPopup(popupRequestDto, userDetails);
     }
 
