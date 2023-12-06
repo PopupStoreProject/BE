@@ -18,7 +18,7 @@ public class PopupResponseDto {
     private String startDate;
     private String endDate;
     private Double latitude;   //위도
-    private  Double longitude;  //경도
+    private Double longitude;  //경도
     private String imageUrl;
     private String homepageUrl;
     private String instagramUrl;
@@ -51,8 +51,8 @@ public class PopupResponseDto {
                 .hashtags(hashtags)
                 .startDate(popupStore.getStartDate())
                 .endDate(popupStore.getEndDate())
-                .latitude(popupStore.getGps().x)
-                .longitude(popupStore.getGps().y)
+                .latitude(popupStore.getGps().getX())
+                .longitude(popupStore.getGps().getY())
                 .imageUrl(popupStore.getImageUrl())
                 .homepageUrl(popupStore.getHomepageUrl())
                 .instagramUrl(popupStore.getInstagramUrl())
@@ -68,8 +68,8 @@ public class PopupResponseDto {
                 .hashtags(hashtags)
                 .startDate(popupStore.getStartDate())
                 .endDate(popupStore.getEndDate())
-                .latitude(popupStore.getGps().x)
-                .longitude(popupStore.getGps().y)
+                .latitude(popupStore.getGps().getX())
+                .longitude(popupStore.getGps().getY())
                 .imageUrl(popupStore.getImageUrl())
                 .homepageUrl(popupStore.getHomepageUrl())
                 .instagramUrl(popupStore.getInstagramUrl())
