@@ -8,17 +8,15 @@ import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
+import com.project.kpaas.global.util.ClientUtil;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.entity.BlogReview;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
-import com.project.kpaas.popup.repository.BlogRepsitory;
-import com.project.kpaas.popup.repository.PopupRepositoryImpl;
+import com.project.kpaas.popup.repository.*;
 import com.project.kpaas.user.entity.User;
-import com.project.kpaas.popup.repository.PopupRepository;
-import com.project.kpaas.popup.repository.RegionRepository;
 import com.project.kpaas.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +38,11 @@ public class PopupService {
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
     private final BlogRepsitory blogRepsitory;
+    private final ClientUtil clientUtil;
 
 
     @Transactional
-    public ResponseEntity<PopupMsgResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<PopupMsgResponseDto> addPopup(PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) throws Exception {
 
         if (userDetails.getUser().getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
@@ -65,7 +64,8 @@ public class PopupService {
             hashtag.addToPopupStore(newPopupStore);
         }
 
-        popupRepository.save(newPopupStore);
+        popupRepository.saveAndFlush(newPopupStore);
+        clientUtil.requestToCrawlServer(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
@@ -180,6 +180,8 @@ public class PopupService {
 
         return ResponseEntity.ok().body(popupResponseDto);
     }
+
+
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
         if (foundHashtags.isEmpty()) {
