@@ -113,11 +113,18 @@ public class PopupService {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
 
-        List<BlogReview> blogReviews = blogRepsitory.findAllByPopupstoreId(popupStore.get().getId());
+        List<BlogReview> foundBlogReviews = blogRepsitory.findAllByPopupstoreId(popupStore.get().getId());
+        List<Map<String,String>> blogReiews = new ArrayList<>();
+        for (BlogReview b : foundBlogReviews) {
+            Map<String,String> blogReviewsDetails = new HashMap<>();
+            blogReviewsDetails.put("link", b.getLink());
+            blogReviewsDetails.put("title", b.getTitle());
+            blogReiews.add(blogReviewsDetails);
+        }
 
         List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] hashtags = getHashtags(foundHashtags);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReviews.toArray(Object[]::new)));
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray()));
     }
 
     @Transactional

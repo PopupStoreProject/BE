@@ -46,7 +46,7 @@ public class PopupResponseDto {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
-                .content(popupStore.getContent())
+//                .content(popupStore.getContent())
                 .category(category)
                 .hashtags(hashtags)
                 .startDate(popupStore.getStartDate())
