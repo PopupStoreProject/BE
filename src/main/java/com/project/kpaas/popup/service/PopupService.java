@@ -9,6 +9,7 @@ import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.global.util.ClientUtil;
+import com.project.kpaas.global.util.RequestUtil;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
@@ -42,6 +43,7 @@ public class PopupService {
     private final BlogRepsitory blogRepsitory;
     private final ImageRepository imageRepository;
     private final ClientUtil clientUtil;
+    private final RequestUtil requestUtil;
 
 
     @Transactional
@@ -74,7 +76,7 @@ public class PopupService {
         }
 
         popupRepository.saveAndFlush(newPopupStore);
-        clientUtil.requestToCrawlServer(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
+        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 

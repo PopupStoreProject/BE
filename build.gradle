@@ -54,6 +54,10 @@ dependencies {
 
 	implementation 'org.hibernate:hibernate-spatial'
 	implementation 'com.querydsl:querydsl-spatial'
+
+	// RestTemplate http 요청
+	implementation 'org.apache.httpcomponents:httpcomponents-core:4.4.16'
+	implementation 'org.apache.httpcomponents:httpcomponents-client:4.5.14'
 }
 
 tasks.named('test') {
