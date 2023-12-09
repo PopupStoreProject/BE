@@ -45,9 +45,6 @@ public class Popupstore {
     private Point gps;
 
     @Column(nullable = false)
-    private String imageUrl;
-
-    @Column(nullable = false)
     private String homepageUrl;
 
     @Column(nullable = true)
@@ -68,6 +65,8 @@ public class Popupstore {
     @OneToMany(mappedBy = "popupstore", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hashtag> hashtags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "popupstore", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Images> images = new ArrayList<>();
 
     @Builder
     private Popupstore(PopupRequestDto popupRequestDto, Category category, User user, Region region) {
@@ -78,7 +77,6 @@ public class Popupstore {
         this.endDate = popupRequestDto.getEndDate();
         this.openingHours = popupRequestDto.getOpeningHours();
         this.gps = setGps(popupRequestDto.getLatitude(), popupRequestDto.getLongitude());
-        this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
         this.instagramUrl = popupRequestDto.getInstagramUrl();
         this.user = user;
@@ -112,7 +110,6 @@ public class Popupstore {
         this.endDate = popupRequestDto.getEndDate();
         this.openingHours = popupRequestDto.getOpeningHours();
         this.setGps(popupRequestDto.getLatitude(), popupRequestDto.getLongitude());
-        this.imageUrl = popupRequestDto.getImageUrl();
         this.homepageUrl = popupRequestDto.getHomepageUrl();
     }
 

@@ -60,7 +60,7 @@ public class MypageService {
                 .stream()
                 .map(bookmark -> {
                     Popupstore popupstore = bookmark.getPopupstore();
-                    return List.of(popupstore.getPopupName(), popupstore.getCategory().getCategoryName(), popupstore.getImageUrl());
+                    return List.of(popupstore.getPopupName(), popupstore.getCategory().getCategoryName());
                 })
                 .collect(Collectors.toList());
 

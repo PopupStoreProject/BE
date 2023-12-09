@@ -60,7 +60,7 @@ public class BrandService {
             List<String> targetPopupDetails = new ArrayList<>();
             targetPopupDetails.add(popupstore.getPopupName());
             targetPopupDetails.add(popupstore.getCategory().getCategoryName());
-            targetPopupDetails.add(popupstore.getImageUrl());
+//            targetPopupDetails.add(popupstore.getImageUrl());
             targetPopupInfos.add(targetPopupDetails);
         }
 
