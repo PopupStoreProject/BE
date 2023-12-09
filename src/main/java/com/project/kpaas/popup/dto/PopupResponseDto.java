@@ -19,14 +19,16 @@ public class PopupResponseDto {
     private String endDate;
     private Double latitude;   //위도
     private Double longitude;  //경도
-    private String imageUrl;
     private String homepageUrl;
     private String instagramUrl;
     @Nullable
     private Object[] blogReview;
 
+    @Nullable
+    private String[] images;
+
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String imageUrl, String homepageUrl, String instagramUrl, Object[] blogReview) {
+    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String homepageUrl, String instagramUrl, Object[] blogReview, String[] images) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
@@ -36,30 +38,31 @@ public class PopupResponseDto {
         this.endDate = endDate;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.imageUrl = imageUrl;
+        this.images = images;
         this.homepageUrl = homepageUrl;
         this.instagramUrl = instagramUrl;
         this.blogReview = blogReview;
     }
 
-    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags) {
+    // 전체, 카테고리 조회
+    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, String[] images) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
-//                .content(popupStore.getContent())
                 .category(category)
                 .hashtags(hashtags)
                 .startDate(popupStore.getStartDate())
                 .endDate(popupStore.getEndDate())
-                .latitude(popupStore.getGps().getX())
-                .longitude(popupStore.getGps().getY())
-                .imageUrl(popupStore.getImageUrl())
-                .homepageUrl(popupStore.getHomepageUrl())
-                .instagramUrl(popupStore.getInstagramUrl())
+//                .latitude(popupStore.getGps().getX())
+//                .longitude(popupStore.getGps().getY())
+                .images(images)
+//                .homepageUrl(popupStore.getHomepageUrl())
+//                .instagramUrl(popupStore.getInstagramUrl())
                 .build();
     }
 
-    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview) {
+    // 상세 조회
+    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview, String[] images) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
@@ -70,10 +73,10 @@ public class PopupResponseDto {
                 .endDate(popupStore.getEndDate())
                 .latitude(popupStore.getGps().getX())
                 .longitude(popupStore.getGps().getY())
-                .imageUrl(popupStore.getImageUrl())
                 .homepageUrl(popupStore.getHomepageUrl())
                 .instagramUrl(popupStore.getInstagramUrl())
                 .blogReview(blogReview)
+                .images(images)
                 .build();
     }
 

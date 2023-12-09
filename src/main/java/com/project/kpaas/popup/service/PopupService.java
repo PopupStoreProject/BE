@@ -13,6 +13,7 @@ import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
 import com.project.kpaas.popup.entity.BlogReview;
+import com.project.kpaas.popup.entity.Images;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.entity.Region;
 import com.project.kpaas.popup.repository.*;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -40,8 +40,8 @@ public class PopupService {
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
     private final BlogRepsitory blogRepsitory;
+    private final ImageRepository imageRepository;
     private final ClientUtil clientUtil;
-    private static final double EARTH_RADIUS = 6371;
 
 
     @Transactional
@@ -67,6 +67,12 @@ public class PopupService {
             hashtag.addToPopupStore(newPopupStore);
         }
 
+        Set<String> newImages = new HashSet<>(Arrays.asList(popupRequestDto.getImages()));
+        for(String i : newImages) {
+            Images images = Images.of(i);
+            images.addToPopupStore(newPopupStore);
+        }
+
         popupRepository.saveAndFlush(newPopupStore);
         clientUtil.requestToCrawlServer(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
@@ -86,7 +92,10 @@ public class PopupService {
         for (Popupstore popupStore : popupStores) {
             List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.getId());
             String[] hashtags = getHashtags(foundHashtags);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags));
+
+            List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.getId());
+            String[] images = getImages(foundImages);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
@@ -100,7 +109,10 @@ public class PopupService {
         for (Popupstore popupStore : popupStores) {
             List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.getId());
             String[] hashtags = getHashtags(foundHashtags);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags));
+
+            List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.getId());
+            String[] images = getImages(foundImages);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
@@ -124,7 +136,10 @@ public class PopupService {
 
         List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] hashtags = getHashtags(foundHashtags);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray()));
+
+        List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.get().getId());
+        String[] images = getImages(foundImages);
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images));
     }
 
     @Transactional
@@ -189,7 +204,10 @@ public class PopupService {
             if (distance <= radius) {
                 List<Hashtag> foundHashtags = hashtagRepository.findAllByPopupstoreId(p.getId());
                 String[] hashtags = getHashtags(foundHashtags);
-                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags));
+
+                List<Images> foundImages = imageRepository.findAllByPopupstoreId(p.getId());
+                String[] images = getImages(foundImages);
+                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags, images));
             } else {
                 throw new CustomException(ErrorCode.NOT_FOUND_NEAR_POPUP);
             }
@@ -219,7 +237,13 @@ public class PopupService {
         return (rad * 180 / Math.PI);
     }
 
-
+    private static String[] getImages(List<Images> foundImages) {
+        if (foundImages.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+        }
+        String[] images = foundImages.stream().map(Images::getImageUrl).toArray(String[]::new);
+        return images;
+    }
 
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
