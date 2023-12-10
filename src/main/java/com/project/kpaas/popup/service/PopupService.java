@@ -10,6 +10,8 @@ import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.global.util.ClientUtil;
 import com.project.kpaas.global.util.RequestUtil;
+import com.project.kpaas.mypage.entity.Bookmark;
+import com.project.kpaas.mypage.repository.BookmarkRepository;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
 import com.project.kpaas.popup.dto.PopupRequestDto;
 import com.project.kpaas.popup.dto.PopupResponseDto;
@@ -40,6 +42,7 @@ public class PopupService {
     private final RegionRepository regionRepository;
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final BlogRepsitory blogRepsitory;
     private final ImageRepository imageRepository;
     private final ClientUtil clientUtil;
@@ -76,13 +79,13 @@ public class PopupService {
         }
 
         popupRepository.saveAndFlush(newPopupStore);
-        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
+//        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
     // 메인페이지 카테고리 조회
     @Transactional
-    public ResponseEntity<List<PopupResponseDto>> searchByCategory(String category) {
+    public ResponseEntity<List<PopupResponseDto>> searchByCategory(String category, UserDetailsImpl userDetails) {
         Optional<Category> foundCategory = categoryRepository.findByCategoryName(category);
         if (foundCategory.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_CATEGORY);
@@ -97,14 +100,16 @@ public class PopupService {
 
             List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.getId());
             String[] images = getImages(foundImages);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images));
+
+            String like = getLike(popupStore.getId(), userDetails);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
 
     // 메인페이지 전체 조회
     @Transactional
-    public ResponseEntity<List<PopupResponseDto>> getAllPopups() {
+    public ResponseEntity<List<PopupResponseDto>> getAllPopups(UserDetailsImpl userDetails) {
         List<Popupstore> popupStores = popupRepository.findAll();
         List<PopupResponseDto> popupResponseDto = new ArrayList<>();
 
@@ -114,14 +119,16 @@ public class PopupService {
 
             List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.getId());
             String[] images = getImages(foundImages);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images));
+
+            String like = getLike(popupStore.getId(), userDetails);
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
 
     // 상세페이지 조회
     @Transactional
-    public ResponseEntity<PopupResponseDto> getPopup(Long id) {
+    public ResponseEntity<PopupResponseDto> getPopup(Long id, UserDetailsImpl userDetails) {
         Optional<Popupstore> popupStore = popupRepository.findById(id);
         if (popupStore.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
@@ -141,7 +148,9 @@ public class PopupService {
 
         List<Images> foundImages = imageRepository.findAllByPopupstoreId(popupStore.get().getId());
         String[] images = getImages(foundImages);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images));
+
+        String like = getLike(id, userDetails);
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images, like));
     }
 
     @Transactional
@@ -192,7 +201,7 @@ public class PopupService {
     }
 
     // 반경과 현재 위치 가지고, MySQL에서 좌표 가져오는 코드
-    public ResponseEntity<List<PopupResponseDto>> searchByRadius(double lat, double lon, double radius) {
+    public ResponseEntity<List<PopupResponseDto>> searchByRadius(double lat, double lon, double radius, UserDetailsImpl userDetails) {
         List<Popupstore> allPopups = popupRepository.findAll();
         if (allPopups.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
@@ -209,13 +218,31 @@ public class PopupService {
 
                 List<Images> foundImages = imageRepository.findAllByPopupstoreId(p.getId());
                 String[] images = getImages(foundImages);
-                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags, images));
+
+                String like = getLike(p.getId(), userDetails);
+                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags, images, like));
             } else {
                 throw new CustomException(ErrorCode.NOT_FOUND_NEAR_POPUP);
             }
         }
 
         return ResponseEntity.ok().body(popupResponseDto);
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponseDto> deletePopup(Long id, User user) {
+
+        if (user.getRole() == UserRole.USER) {
+            throw new CustomException(ErrorCode.AUTHORIZATION);
+        }
+
+        Optional<Popupstore> popupstore = popupRepository.findByIdAndUser(id, user);
+        if (popupstore.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
+        }
+
+        popupRepository.deleteById(popupstore.get().getId());
+        return ResponseEntity.ok().body(MessageResponseDto.of("삭제가 완료되었습니다.", HttpStatus.OK));
     }
 
     // 두 거리 사이 구해서 반경이 해당 범위 안이면 ok
@@ -256,20 +283,13 @@ public class PopupService {
         return hashtags;
     }
 
-    @Transactional
-    public ResponseEntity<MessageResponseDto> deletePopup(Long id, User user) {
-
-        if (user.getRole() == UserRole.USER) {
-            throw new CustomException(ErrorCode.AUTHORIZATION);
+    private String getLike(Long id, UserDetailsImpl userDetails) {
+        Optional<Bookmark> userBookmark = bookmarkRepository.findByPopupstoreIdAndUserId(id, userDetails.getUser().getId());
+        String like = "N";
+        if (userBookmark.isPresent()) {
+            like = "Y";
         }
-
-        Optional<Popupstore> popupstore = popupRepository.findByIdAndUser(id, user);
-        if (popupstore.isEmpty()) {
-            throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
-        }
-
-        popupRepository.deleteById(popupstore.get().getId());
-        return ResponseEntity.ok().body(MessageResponseDto.of("삭제가 완료되었습니다.", HttpStatus.OK));
+        return like;
     }
 
     private Region findRegion(PopupRequestDto popupRequestDto, Region requestedRegion) {
