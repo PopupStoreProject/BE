@@ -1,5 +1,7 @@
 package com.project.kpaas.popup.service;
 
+import com.project.kpaas.brandPage.entity.Brand;
+import com.project.kpaas.brandPage.repository.BrandRepository;
 import com.project.kpaas.classification.entity.Category;
 import com.project.kpaas.classification.entity.Hashtag;
 import com.project.kpaas.classification.repository.CategoryRepository;
@@ -43,6 +45,7 @@ public class PopupService {
     private final CategoryRepository categoryRepository;
     private final HashtagRepository hashtagRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final BrandRepository brandRepository;
     private final BlogRepsitory blogRepsitory;
     private final ImageRepository imageRepository;
     private final ClientUtil clientUtil;
@@ -150,7 +153,12 @@ public class PopupService {
         String[] images = getImages(foundImages);
 
         String like = getLike(id, userDetails);
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images, like));
+
+        Optional<Brand> brand = brandRepository.findByUserId(popupStore.get().getUser().getId());
+        if(brand.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_BRAND_IMAGE);
+        }
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images, like, brand.get().getBrandImageUrl()));
     }
 
     @Transactional
