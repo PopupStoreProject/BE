@@ -26,18 +26,18 @@ public class PopupController {
     }
 
     @GetMapping("/popups")
-    public ResponseEntity<List<PopupResponseDto>> allPopupGet() {
-        return popupService.getAllPopups();
+    public ResponseEntity<List<PopupResponseDto>> allPopupGet(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.getAllPopups(userDetails);
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<PopupResponseDto>> categorySearch(@RequestParam(value = "c") String category) {
-        return popupService.searchByCategory(category);
+    public ResponseEntity<List<PopupResponseDto>> categorySearch(@RequestParam(value = "c") String category, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.searchByCategory(category, userDetails);
     }
 
     @GetMapping("/popup/{id}")
-    public ResponseEntity<PopupResponseDto> popupGet(@PathVariable Long id) {
-        return popupService.getPopup(id);
+    public ResponseEntity<PopupResponseDto> popupGet(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.getPopup(id, userDetails);
     }
 
     @PutMapping("/popup/{id}")
@@ -54,8 +54,9 @@ public class PopupController {
     @GetMapping("/gps")
     public ResponseEntity<List<PopupResponseDto>> gpsSearch(@RequestParam(value = "lat") double lat,
                                                             @RequestParam(value = "lon") double lon,
-                                                            @RequestParam(value = "radius") double radius) {
-        return popupService.searchByRadius(lat, lon, radius);
+                                                            @RequestParam(value = "radius") double radius,
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return popupService.searchByRadius(lat, lon, radius, userDetails);
     }
 
 }

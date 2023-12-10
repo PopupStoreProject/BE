@@ -27,8 +27,10 @@ public class PopupResponseDto {
     @Nullable
     private String[] images;
 
+    private String like;
+
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String homepageUrl, String instagramUrl, Object[] blogReview, String[] images) {
+    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String homepageUrl, String instagramUrl, Object[] blogReview, String[] images, String like) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
@@ -42,10 +44,11 @@ public class PopupResponseDto {
         this.homepageUrl = homepageUrl;
         this.instagramUrl = instagramUrl;
         this.blogReview = blogReview;
+        this.like = like;
     }
 
     // 전체, 카테고리 조회
-    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, String[] images) {
+    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, String[] images, String like) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
@@ -56,13 +59,14 @@ public class PopupResponseDto {
 //                .latitude(popupStore.getGps().getX())
 //                .longitude(popupStore.getGps().getY())
                 .images(images)
+                .like(like)
 //                .homepageUrl(popupStore.getHomepageUrl())
 //                .instagramUrl(popupStore.getInstagramUrl())
                 .build();
     }
 
     // 상세 조회
-    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview, String[] images) {
+    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview, String[] images, String like) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
@@ -77,6 +81,7 @@ public class PopupResponseDto {
                 .instagramUrl(popupStore.getInstagramUrl())
                 .blogReview(blogReview)
                 .images(images)
+                .like(like)
                 .build();
     }
 
