@@ -14,6 +14,7 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "회원을 찾을 수 없습니다."),
     NOT_FOUND_POPUP(HttpStatus.BAD_REQUEST, "해당 팝업스토어를 찾을 수 없습니다."),
     NOT_FOUND_IMAGE(HttpStatus.BAD_REQUEST, "해당 이미지를 찾을 수 없습니다."),
+    NOT_FOUND_BRAND_IMAGE(HttpStatus.BAD_REQUEST, "해당 브랜드 이미지를 찾을 수 없습니다."),
     NOT_FOUND_NEAR_POPUP(HttpStatus.BAD_REQUEST, "해당 반경 내 팝업스토어를 찾을 수 없습니다."),
     NOT_FOUND_BRAND(HttpStatus.BAD_REQUEST, "해당 브랜드를 찾을 수 없습니다."),
     NOT_FOUND_CATEGORY(HttpStatus.BAD_REQUEST, "해당 카테고리를 찾을 수 없습니다."),

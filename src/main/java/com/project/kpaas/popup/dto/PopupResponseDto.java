@@ -28,9 +28,10 @@ public class PopupResponseDto {
     private String[] images;
 
     private String like;
+    private String brandImage;
 
     @Builder
-    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String homepageUrl, String instagramUrl, Object[] blogReview, String[] images, String like) {
+    private PopupResponseDto(Long id, String popupName, String content, String category, String[] hashtags, String startDate, String endDate, Double latitude, Double longitude, String homepageUrl, String instagramUrl, Object[] blogReview, String[] images, String like, String brandImage) {
         this.id = id;
         this.popupName = popupName;
         this.content = content;
@@ -45,6 +46,7 @@ public class PopupResponseDto {
         this.instagramUrl = instagramUrl;
         this.blogReview = blogReview;
         this.like = like;
+        this.brandImage = brandImage;
     }
 
     // 전체, 카테고리 조회
@@ -66,7 +68,7 @@ public class PopupResponseDto {
     }
 
     // 상세 조회
-    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview, String[] images, String like) {
+    public static PopupResponseDto of(Popupstore popupStore, String category, String[] hashtags, Object[] blogReview, String[] images, String like, String brandImage) {
         return PopupResponseDto.builder()
                 .id(popupStore.getId())
                 .popupName(popupStore.getPopupName())
@@ -82,6 +84,7 @@ public class PopupResponseDto {
                 .blogReview(blogReview)
                 .images(images)
                 .like(like)
+                .brandImage(brandImage)
                 .build();
     }
 
