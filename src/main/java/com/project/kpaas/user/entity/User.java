@@ -29,6 +29,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
 
+    @Column(nullable = true, columnDefinition = "MEDIUMBLOB")
+    private String userImage;
+
     @Builder
     private User(String username, String email, String password, UserRole role) {
         this.username = username;
@@ -47,10 +50,8 @@ public class User {
     }
 
     public void update(MypageRequestDto mypageRequestDto) {
-        String newUsername = mypageRequestDto.getUsername();
-        if (newUsername != null) {
-            this.username = newUsername;
-        }
+        this.username = mypageRequestDto.getUsername();
+        this.userImage = mypageRequestDto.getUserImage();
     }
 
 }

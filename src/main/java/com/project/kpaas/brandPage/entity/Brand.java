@@ -48,4 +48,11 @@ public class Brand {
                 .user(user)
                 .build();
     }
+
+    public void update(BrandRequestDto brandRequestDto) {
+        this.brandName = brandRequestDto.getBrandName();
+        this.brandImageUrl = brandRequestDto.getBrandImageUrl();
+        this.content = brandRequestDto.getContent();
+        this.instagramUrl = brandRequestDto.getInstagramUrl();
+    }
 }
