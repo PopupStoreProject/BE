@@ -105,7 +105,10 @@ public class PopupService {
             String[] images = getImages(foundImages);
 
             String like = getLike(popupStore.getId(), userDetails);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like));
+
+            Optional<Region> foundRegion = regionRepository.findById(popupStore.getRegion().getId());
+            String regionName = foundRegion.get().getRegionName();
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like, regionName));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
@@ -124,7 +127,10 @@ public class PopupService {
             String[] images = getImages(foundImages);
 
             String like = getLike(popupStore.getId(), userDetails);
-            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like));
+
+            Optional<Region> foundRegion = regionRepository.findById(popupStore.getRegion().getId());
+            String regionName = foundRegion.get().getRegionName();
+            popupResponseDto.add(PopupResponseDto.of(popupStore, popupStore.getCategory().getCategoryName(), hashtags, images, like, regionName));
         }
         return ResponseEntity.ok().body(popupResponseDto);
     }
@@ -158,7 +164,10 @@ public class PopupService {
         if(brand.isEmpty()) {
             throw new CustomException(ErrorCode.NOT_FOUND_BRAND_IMAGE);
         }
-        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images, like, brand.get().getBrandImageUrl()));
+
+        Optional<Region> foundRegion = regionRepository.findById(popupStore.get().getRegion().getId());
+        String regionName = foundRegion.get().getRegionName();
+        return ResponseEntity.ok().body(PopupResponseDto.of(popupStore.get(), popupStore.get().getCategory().getCategoryName(), hashtags, blogReiews.toArray(), images, like, brand.get().getBrandImageUrl(), regionName));
     }
 
     @Transactional
@@ -228,7 +237,10 @@ public class PopupService {
                 String[] images = getImages(foundImages);
 
                 String like = getLike(p.getId(), userDetails);
-                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags, images, like));
+
+                Optional<Region> foundRegion = regionRepository.findById(p.getRegion().getId());
+                String regionName = foundRegion.get().getRegionName();
+                popupResponseDto.add(PopupResponseDto.of(p, p.getCategory().getCategoryName(), hashtags, images, like, regionName));
             } else {
                 throw new CustomException(ErrorCode.NOT_FOUND_NEAR_POPUP);
             }
