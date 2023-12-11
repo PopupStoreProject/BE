@@ -21,8 +21,11 @@ import org.springframework.http.ResponseEntity;
 
 import com.project.kpaas.user.entity.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,34 +71,34 @@ public class MypageService {
     }
 
     @Transactional
-    public MessageResponseDto updateMyInfo(MypageRequestDto mypageRequestDto, User user) {
+    public MessageResponseDto updateMyInfo(@RequestBody  MypageRequestDto mypageRequestDto, User user) {
         Optional<User> foundUser = userRepository.findById(user.getId());
         if(foundUser.isEmpty()){
             throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         foundUser.get().update(mypageRequestDto);
 
-        List<String> newCategoryPreference = mypageRequestDto.getCategoryPreference();
+        List<String> newCategoryPreference = new ArrayList<>(Arrays.asList(mypageRequestDto.getCategoryPreference()));
         List<CategoryPreference> foundCategoryPreferences = categoryPreferenceRepository.findAllByUserId(foundUser.get().getId());
-
-        for (CategoryPreference existingPreference : foundCategoryPreferences) {
-            String existingCategory = existingPreference.getCategory().getCategoryName();
-            if (!newCategoryPreference.contains(existingCategory)) {
-                categoryPreferenceRepository.delete(existingPreference);
-            }
+        if (newCategoryPreference.isEmpty()) {
+            categoryPreferenceRepository.deleteAllByUserId(foundUser.get().getId());
         }
-
-        for (String newCategory : newCategoryPreference) {
-            if (foundCategoryPreferences.stream().noneMatch(c -> c.getCategory().getCategoryName().equals(newCategory))) {
-                Optional<Category> foundCategory = categoryRepository.findByCategoryName(newCategory);
-                if (foundCategory.isEmpty()) {
-                    throw new CustomException(NOT_FOUND_CATEGORY);
-                }
-                categoryPreferenceRepository.save(CategoryPreference.of(user, foundCategory.get()));
-            }
-        }
+        changeCategoryPreference(user, newCategoryPreference, foundCategoryPreferences);
 
         return MessageResponseDto.of("수정이 완료 되었습니다.", HttpStatus.OK);
+    }
+
+
+    private void changeCategoryPreference(User user, List<String> newCategoryPreference, List<CategoryPreference> foundCategoryPreferences) {
+        foundCategoryPreferences.stream()
+                .filter(existingPreference -> !newCategoryPreference.contains(existingPreference.getCategory().getCategoryName()))
+                .forEach(categoryPreferenceRepository::delete);
+
+        newCategoryPreference.stream()
+                .filter(newCategory -> foundCategoryPreferences.stream().noneMatch(c -> c.getCategory().getCategoryName().equals(newCategory)))
+                .map(newCategory -> categoryRepository.findByCategoryName(newCategory)
+                        .orElseThrow(() -> new CustomException(NOT_FOUND_CATEGORY)))
+                .forEach(foundCategory -> categoryPreferenceRepository.save(CategoryPreference.of(user, foundCategory)));
     }
 
     @Transactional
@@ -109,14 +112,17 @@ public class MypageService {
         Optional<User> foundMember = userRepository.findById(user.getId());
 
         Optional<Bookmark> bookmark = bookmarkRepository.findByPopupstoreIdAndUserId(id, foundMember.get().getId());
+        return getBookMark(foundPopupstore, foundMember, bookmark);
+    }
+
+    private ResponseEntity<MessageResponseDto> getBookMark(Optional<Popupstore> foundPopupstore, Optional<User> foundMember, Optional<Bookmark> bookmark) {
         if (bookmark.isEmpty()) {
             Bookmark newBookmark = Bookmark.of(foundPopupstore.get(), foundMember.get());
             bookmarkRepository.save(newBookmark);
             return ResponseEntity.ok().body(MessageResponseDto.of("즐겨찾기 추가", HttpStatus.OK));
-        } else {
-            bookmarkRepository.deleteByPopupstoreId(foundPopupstore.get().getId());
-            return ResponseEntity.ok().body(MessageResponseDto.of("즐겨찾기 취소", HttpStatus.OK));
         }
+        bookmarkRepository.deleteByPopupstoreId(foundPopupstore.get().getId());
+        return ResponseEntity.ok().body(MessageResponseDto.of("즐겨찾기 취소", HttpStatus.OK));
     }
 
 

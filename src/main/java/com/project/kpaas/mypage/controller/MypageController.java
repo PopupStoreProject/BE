@@ -22,7 +22,7 @@ public class MypageController {
     }
 
     @PutMapping("/mypage/edit")
-    public MessageResponseDto myInfoUpdate(MypageRequestDto mypageRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public MessageResponseDto myInfoUpdate(@RequestBody MypageRequestDto mypageRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return mypageService.updateMyInfo(mypageRequestDto, userDetails.getUser());
     }
 

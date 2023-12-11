@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,17 @@ public class BrandService {
         }
 
         return ResponseEntity.ok().body(BrandResponseDto.of(foundBrand.get(), foundUser.get(), targetPopupInfos.toArray(Object[]::new)));
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponseDto> updateBrandInfo(BrandRequestDto brandRequestDto, UserDetailsImpl userDetails) {
+        Optional<Brand> foundBrand = brandRepository.findByUserId(userDetails.getUser().getId());
+        if (foundBrand.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
+
+        foundBrand.get().update(brandRequestDto);
+        return ResponseEntity.ok().body(MessageResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
     }
 
 }
