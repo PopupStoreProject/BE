@@ -11,7 +11,8 @@ import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
 import com.project.kpaas.global.util.ClientUtil;
-import com.project.kpaas.global.util.RequestUtil;
+import com.project.kpaas.global.util.RequestUtilCrawling;
+import com.project.kpaas.global.util.RequestUtilVector;
 import com.project.kpaas.mypage.entity.Bookmark;
 import com.project.kpaas.mypage.repository.BookmarkRepository;
 import com.project.kpaas.popup.dto.PopupMsgResponseDto;
@@ -26,7 +27,6 @@ import com.project.kpaas.user.entity.User;
 import com.project.kpaas.user.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,8 @@ public class PopupService {
     private final BlogRepsitory blogRepsitory;
     private final ImageRepository imageRepository;
     private final ClientUtil clientUtil;
-    private final RequestUtil requestUtil;
+    private final RequestUtilCrawling requestUtil;
+    private final RequestUtilVector requestUtilVector;
 
 
     @Transactional
@@ -69,10 +70,12 @@ public class PopupService {
 
         Popupstore newPopupStore = Popupstore.of(popupRequestDto, foundCategoryName.get(), userDetails.getUser(), region);
         Set<String> hashtags = new HashSet<>(Arrays.asList(popupRequestDto.getHashtags()));
+        String hashtagString = "";
 
         for (String h : hashtags) {
             Hashtag hashtag = Hashtag.of(h);
             hashtag.addToPopupStore(newPopupStore);
+            hashtagString.concat(h);
         }
 
         Set<String> newImages = new HashSet<>(Arrays.asList(popupRequestDto.getImages()));
@@ -83,6 +86,7 @@ public class PopupService {
 
         popupRepository.saveAndFlush(newPopupStore);
 //        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
+        requestUtilVector.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getContent(), newPopupStore.getCategory().getCategoryName(), hashtagString);
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
 
@@ -171,7 +175,7 @@ public class PopupService {
     }
 
     @Transactional
-    public ResponseEntity<MessageResponseDto> updatePopup(Long id, PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> updatePopup(Long id, PopupRequestDto popupRequestDto, UserDetailsImpl userDetails) throws Exception {
 
         if (userDetails.getUser().getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
@@ -185,6 +189,7 @@ public class PopupService {
         List<Hashtag> currentHashtags = hashtagRepository.findAllByPopupstoreId(foundPopupstore.get().getId());
         List<String> inputHastags = new ArrayList<>(Arrays.asList(popupRequestDto.getHashtags()));
         List<String> newHashtags = new ArrayList<>();
+        String hashtagString = "";
 
         for (Hashtag hashtag : currentHashtags) {
             if(!inputHastags.contains(hashtag.getContent())){
@@ -199,6 +204,7 @@ public class PopupService {
                 hashtag.addToPopupStore(foundPopupstore.get());
                 hashtagRepository.save(hashtag);
             }
+            hashtagString.concat(input);
         }
 
         Optional<Category> category = categoryRepository.findByCategoryName(popupRequestDto.getCategory());
@@ -214,6 +220,8 @@ public class PopupService {
 
         foundPopupstore.get().update(popupRequestDto, category.get(), region.get());
 
+        Popupstore p = foundPopupstore.get();
+        requestUtilVector.sendRequest(p.getId(), p.getPopupName(), p.getContent(), p.getCategory().getCategoryName(), hashtagString);
         return ResponseEntity.ok().body(MessageResponseDto.of("수정이 완료되었습니다.", HttpStatus.OK));
     }
 
@@ -250,7 +258,7 @@ public class PopupService {
     }
 
     @Transactional
-    public ResponseEntity<MessageResponseDto> deletePopup(Long id, User user) {
+    public ResponseEntity<MessageResponseDto> deletePopup(Long id, User user) throws Exception {
 
         if (user.getRole() == UserRole.USER) {
             throw new CustomException(ErrorCode.AUTHORIZATION);
@@ -261,7 +269,12 @@ public class PopupService {
             throw new CustomException(ErrorCode.NOT_FOUND_POPUP);
         }
 
+        imageRepository.deleteByPopupstoreId(popupstore.get().getId());
+        hashtagRepository.deleteByPopupstoreId(popupstore.get().getId());
+        bookmarkRepository.deleteByPopupstoreId(popupstore.get().getId());
         popupRepository.deleteById(popupstore.get().getId());
+
+        requestUtilVector.sendRequestDelete(popupstore.get().getId());
         return ResponseEntity.ok().body(MessageResponseDto.of("삭제가 완료되었습니다.", HttpStatus.OK));
     }
 

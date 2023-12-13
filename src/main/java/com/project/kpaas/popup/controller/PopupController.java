@@ -41,12 +41,12 @@ public class PopupController {
     }
 
     @PutMapping("/popup/{id}")
-    public ResponseEntity<MessageResponseDto> popupUpdate(@PathVariable Long id, @RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> popupUpdate(@PathVariable Long id, @RequestBody PopupRequestDto popupRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
         return popupService.updatePopup(id, popupRequestDto, userDetails);
     }
 
     @DeleteMapping("/popup/{id}")
-    public ResponseEntity<MessageResponseDto> popupDelete(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<MessageResponseDto> popupDelete(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
         return popupService.deletePopup(id, userDetails.getUser());
     }
 
