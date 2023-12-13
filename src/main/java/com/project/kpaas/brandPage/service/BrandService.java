@@ -8,6 +8,7 @@ import com.project.kpaas.global.dto.MessageResponseDto;
 import com.project.kpaas.global.exception.CustomException;
 import com.project.kpaas.global.exception.ErrorCode;
 import com.project.kpaas.global.security.UserDetailsImpl;
+import com.project.kpaas.popup.entity.Images;
 import com.project.kpaas.popup.entity.Popupstore;
 import com.project.kpaas.popup.repository.PopupRepository;
 import com.project.kpaas.user.entity.User;
@@ -61,7 +62,9 @@ public class BrandService {
             List<String> targetPopupDetails = new ArrayList<>();
             targetPopupDetails.add(popupstore.getPopupName());
             targetPopupDetails.add(popupstore.getCategory().getCategoryName());
-//            targetPopupDetails.add(popupstore.getImageUrl());
+            for ( Images i : popupstore.getImages()) {
+                targetPopupDetails.add(i.getImageUrl());
+            }
             targetPopupInfos.add(targetPopupDetails);
         }
 

@@ -85,7 +85,7 @@ public class PopupService {
         }
 
         popupRepository.saveAndFlush(newPopupStore);
-//        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
+        requestUtil.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getStartDate());
         requestUtilVector.sendRequest(newPopupStore.getId(), newPopupStore.getPopupName(), newPopupStore.getContent(), newPopupStore.getCategory().getCategoryName(), hashtagString);
         return ResponseEntity.ok().body(PopupMsgResponseDto.of(HttpStatus.OK.value(), "팝업스토어 등록 완료", newPopupStore.getId()));
     }
@@ -309,9 +309,6 @@ public class PopupService {
 
 
     private static String[] getHashtags(List<Hashtag> foundHashtags) {
-        if (foundHashtags.isEmpty()) {
-            throw new CustomException(ErrorCode.NOT_FOUND_HASHTAG);
-        }
         String[] hashtags = foundHashtags.stream().map(Hashtag::getContent).toArray(String[]::new);
         return hashtags;
     }
