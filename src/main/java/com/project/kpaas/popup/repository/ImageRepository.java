@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ImageRepository extends JpaRepository<Images, Long> {
     List<Images> findAllByPopupstoreId(Long popupId);
+    void deleteByPopupstoreId(Long id);
 }

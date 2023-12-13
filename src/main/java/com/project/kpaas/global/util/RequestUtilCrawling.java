@@ -13,12 +13,12 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class RequestUtil {
+public class RequestUtilCrawling {
 
     public String sendRequest(Long popupId, String popupTitle, String popupDate) throws Exception{
         URI uri = UriComponentsBuilder
-                .fromUriString("https://6objhmhr4j.execute-api.ap-northeast-2.amazonaws.com")
-                .path("/test/crawl")
+                .fromUriString("https://flask-review.k-paas.org")
+                .path("/crawl")
                 .encode()
                 .build()
                 .toUri();
@@ -29,9 +29,9 @@ public class RequestUtil {
 
         // ObjectMapper 활용한 JSON 바인딩
         Map<String, String> body = new HashMap<>();
-        body.put("popup_id", popupId.toString());
         body.put("popup_title", popupTitle);
         body.put("popup_date", popupDate);
+        body.put("popup_id", popupId.toString());
 
         HttpEntity entity = new HttpEntity(body, headers);
 

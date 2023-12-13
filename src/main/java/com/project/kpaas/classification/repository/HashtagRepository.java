@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     List<Hashtag> findAllByPopupstoreId(Long id);
+    void deleteByPopupstoreId(Long id);
 }
